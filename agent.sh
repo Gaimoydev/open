@@ -11,7 +11,7 @@ echo -e "\033[0;31m本脚本由 YesCDN 提供! \033[0m"
 read -p "按 Enter 键继续运行脚本..."
 #更改host
 
-echo "156.238.231.103 auth.cdnfly.cn monitor.cdnfly.cn" | sudo tee -a /etc/hosts
+echo "38.207.178.16 auth.cdnfly.cn monitor.cdnfly.cn" | sudo tee -a /etc/hosts
 
 #判断系统版本
 check_sys(){
