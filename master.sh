@@ -222,14 +222,13 @@ else
     exit 1
   fi
 
-  #dir_name="cdnfly-master-$VER"
-  dir_name="cdnfly-master-v5.1.13"
+  dir_name="cdnfly-master-$VER"
   tar_gz_name="$dir_name-$(get_sys_ver).tar.gz"
   echo "安装指定版本$VER"
 fi
 
 cd /opt/
-download "https://github.com/LoveesYe/cdnflydadao/raw/main/cdnfly/v5.1.13/master/$tar_gz_name" "https://github.com/LoveesYe/cdnflydadao/raw/main/cdnfly/v5.1.13/master/$tar_gz_name" "$tar_gz_name"
+download "https://raw.githubusercontent.com/Steady-WJ/cdnfly-kaixin/main/cdnfly/$tar_gz_name" "https://raw.githubusercontent.com/Steady-WJ/cdnfly-kaixin/main/cdnfly/$tar_gz_name" "$tar_gz_name"
 
 tar xf $tar_gz_name
 rm -rf cdnfly
@@ -241,6 +240,14 @@ chmod +x install.sh
 ./install.sh $@
 
 if [ -f /opt/cdnfly/master/view/upgrade.so ]; then
-	sed -i "s/https:\/\/update.cdnfly.cn\//http:\/\/auth.cdnfly.cn\/\/\/\//g" /opt/cdnfly/master/view/upgrade.so
+	wget https://raw.githubusercontent.com/Steady-WJ/cdnfly-kaixin/main/cdnfly/api.py -O /opt/venv/lib/python2.7/site-packages/requests/api.py
 	supervisorctl -c /opt/cdnfly/master/conf/supervisord.conf reload
+
+	source /opt/venv/bin/activate
+    cd /opt/cdnfly/master/view
+    ret=`python -c "import util;print util.get_auth_code()" || true`
+    [[ $ret == "(True, None)" ]] && echo "已获取到授权" || echo "未授权，请先购买"
+    deactivate
+
+    echo "安装主控成功！"
 fi
