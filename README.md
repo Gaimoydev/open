@@ -3,6 +3,8 @@ curl -fsSL https://github.com/Gaimoydev/open/raw/main/master.sh -o master.sh && 
 curl -fsSL https://github.com/Gaimoydev/open/raw/main/move.sh -o move.sh && chmod +x move.sh && ./move.sh ip pwd
 
 cdnfly页面404解决+登录美化: curl -fsSL https://github.com/Gaimoydev/open/raw/main/fixed.sh -o fixed.sh && chmod +x fixed.sh && ./fixed.sh
+
+
 支付跳转页面(防404): http://域名/src/views/account/balance/return.html
 
 <p>重启进程<br />
