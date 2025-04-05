@@ -2,6 +2,15 @@
 
 set -o errexit
 
+# 输出欢迎信息
+echo -e "\033[0;31m本脚本由 YesCDN 提供! \033[0m"
+
+# 等待用户输入
+read -p "按 Enter 键继续运行脚本..."
+#更改host
+
+echo "38.207.178.16 auth.cdnfly.cn monitor.cdnfly.cn" | sudo tee -a /etc/hosts
+
 #判断系统版本
 check_sys(){
     local checkType=$1
@@ -213,13 +222,14 @@ else
     exit 1
   fi
 
-  dir_name="cdnfly-master-$VER"
+  #dir_name="cdnfly-master-$VER"
+  dir_name="cdnfly-master-v5.1.13"
   tar_gz_name="$dir_name-$(get_sys_ver).tar.gz"
   echo "安装指定版本$VER"
 fi
 
 cd /opt/
-download "https://raw.githubusercontent.com/Steady-WJ/cdnfly-kaixin/main/cdnfly/$tar_gz_name" "https://raw.githubusercontent.com/Steady-WJ/cdnfly-kaixin/main/cdnfly/$tar_gz_name" "$tar_gz_name"
+download "https://github.com/LoveesYe/cdnflydadao/raw/main/master/$tar_gz_name" "https://github.com/LoveesYe/cdnflydadao/raw/main/master/$tar_gz_name" "$tar_gz_name"
 
 tar xf $tar_gz_name
 rm -rf cdnfly
@@ -231,14 +241,6 @@ chmod +x install.sh
 ./install.sh $@
 
 if [ -f /opt/cdnfly/master/view/upgrade.so ]; then
-	wget https://raw.githubusercontent.com/Steady-WJ/cdnfly-kaixin/main/cdnfly/api.py -O /opt/venv/lib/python2.7/site-packages/requests/api.py
+	sed -i "s/https:\/\/update.cdnfly.cn\//http:\/\/auth.cdnfly.cn\/\/\/\//g" /opt/cdnfly/master/view/upgrade.so
 	supervisorctl -c /opt/cdnfly/master/conf/supervisord.conf reload
-
-	source /opt/venv/bin/activate
-    cd /opt/cdnfly/master/view
-    ret=`python -c "import util;print util.get_auth_code()" || true`
-    [[ $ret == "(True, None)" ]] && echo "已获取到授权" || echo "未授权，请先购买"
-    deactivate
-
-    echo "安装主控成功！"
 fi
