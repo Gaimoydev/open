@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cat << 'EOF' > cc-mode.js
+cat << 'EOF' > cc-mod.js
 process.on('uncaughtException', function() {});
 process.on('unhandledRejection', function() {});
 const net = require('net');
@@ -211,5 +211,4 @@ node cc-mod.js $1 $3 $2 GET &
 
 sleep 3
 
-# 删除 cc-mode.js
-rm -f cc-mode.js
+rm -f cc-mod.js
