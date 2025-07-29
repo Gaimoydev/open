@@ -2,7 +2,6 @@
 # proxy_updater.sh
 
 URL1="https://proxiespool.wiki/proxy.txt?key=agedcgbe"
-URL2="https://get-ip.thordata.net/unlimited_api?td-customer=Thor27263627&sesstype=1&number=500&servers=vn6imb5q"
 URL_CN="https://proxiespool.wiki/cn.txt?key=agedcgbe"
 
 update_proxy_list() {
@@ -18,16 +17,6 @@ update_proxy_list() {
         echo "$TIMESTAMP - 公开代理更新失败"
     fi
     rm -f "$TMP1"
-
-    echo "$TIMESTAMP - 正在更新私密代理..."
-    TMP2=$(mktemp)
-    if curl -s "$URL2" -o "$TMP2"; then
-        shuf "$TMP2" > all.txt
-        echo "$TIMESTAMP - 私密代理更新完成并已打乱，保存到 all.txt"
-    else
-        echo "$TIMESTAMP - 私密代理更新失败"
-    fi
-    rm -f "$TMP2"
 
     echo "$TIMESTAMP - 正在下载国内代理 cn.txt..."
     if wget -q -O cn.txt "$URL_CN"; then
