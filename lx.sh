@@ -39,13 +39,63 @@ clean_large_logs() {
     chmod 777 /tmp
 }
 
-# ------------------- 任务批次 -------------------
-day_commands=(
-)
+# ------------------- 命令数组 -------------------
+day_commands=()
+night_commands=()
 
+# ------------------- 检查命令并交互填写 -------------------
+if [ ${#day_commands[@]} -eq 0 ] && [ ${#night_commands[@]} -eq 0 ]; then
+    echo "⚙️ 检测到 day_commands 与 night_commands 为空。"
+    echo "请输入白天任务命令（每行一个，输入 ok 结束）："
+    while true; do
+        read -r cmd
+        [ "$cmd" = "ok" ] && break
+        [ -n "$cmd" ] && day_commands+=("$cmd")
+    done
 
-night_commands=(
-)
+    echo "✅ 白天任务录入完成。"
+    echo "请输入夜间任务命令（每行一个，输入 ok 结束）："
+    while true; do
+        read -r cmd
+        [ "$cmd" = "ok" ] && break
+        [ -n "$cmd" ] && night_commands+=("$cmd")
+    done
+
+    echo "✅ 夜间任务录入完成，保存到 lx.sh ..."
+
+    # 重写 lx.sh 文件（保留脚本主体）
+    sed -i '/^day_commands=/,$d' "$0"
+    {
+        echo ""
+        echo "day_commands=("
+        for c in "${day_commands[@]}"; do
+            echo "    \"$c\""
+        done
+        echo ")"
+        echo ""
+        echo "night_commands=("
+        for c in "${night_commands[@]}"; do
+            echo "    \"$c\""
+        done
+        echo ")"
+        echo ""
+        tail -n +$(($(grep -n '^# ------------------- 主循环 -------------------' "$0" | cut -d: -f1))) "$0"
+    } >> "$0"
+
+    echo "💾 已将任务写入脚本。下次运行将自动加载。"
+    echo "请重新运行脚本以应用配置。"
+    exit 0
+fi
+
+# ------------------- 启动前预览 -------------------
+echo "=============================="
+echo "🌞 白天任务:"
+for cmd in "${day_commands[@]}"; do echo "  - $cmd"; done
+echo ""
+echo "🌙 夜间任务:"
+for cmd in "${night_commands[@]}"; do echo "  - $cmd"; done
+echo "=============================="
+read -p "按回车键开始执行任务..." _
 
 # ------------------- 主循环 -------------------
 echo "[$(date +'%Y-%m-%d %H:%M:%S')] 初始化完成，开始轮询..."
@@ -84,7 +134,7 @@ while $running; do
 
         setsid timeout --preserve-status -s INT --kill-after=5 150 bash -c "$cmd" >> "$log_file" 2>&1
 
-        pkill -9 -f "node tornadov3.js" 2>/dev/null
+        pkill -9 -f "node" 2>/dev/null
         pgrep -f Xvfb | xargs -r kill -9 2>/dev/null
 
         if ! $running; then echo "🚪 中断退出中..."; exit 0; fi
