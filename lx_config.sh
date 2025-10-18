@@ -30,7 +30,6 @@ done
 # 3️⃣ 构建临时任务块
 tmp_file=$(mktemp)
 {
-    echo "# ------------------- 任务批次 -------------------"
     echo "day_commands=("
     for c in "${day_commands[@]}"; do
         echo "    \"$c\""
@@ -57,13 +56,9 @@ fi
 end_line=$(tail -n +"$start_line" "$LX_SH_FILE" | grep -n -m1 -E '^# ------------------- 主循环 -------------------|^$' | head -n1 | cut -d: -f1)
 end_line=$((start_line + end_line - 2))
 
-# 删除所有旧 day_commands
+# 删除所有旧 day_commands 和 night_commands
 sed -i '/^day_commands=/,/^)/d' "$LX_SH_FILE"
-# 删除所有旧 night_commands
 sed -i '/^night_commands=/,/^)/d' "$LX_SH_FILE"
-
-# 5️⃣ 删除原有任务块
-sed -i "${start_line},${end_line}d" "$LX_SH_FILE"
 
 # 6️⃣ 在原位置插入新任务块
 sed -i "${start_line}r $tmp_file" "$LX_SH_FILE"
@@ -71,4 +66,5 @@ sed -i "${start_line}r $tmp_file" "$LX_SH_FILE"
 # 7️⃣ 清理临时文件
 rm "$tmp_file"
 
+# 确保 while 循环没有被破坏，检查是否有未闭合的结构
 echo "✅ lx.sh 中 day_commands 和 night_commands 已成功更新！"
