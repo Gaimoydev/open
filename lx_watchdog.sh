@@ -1,4 +1,16 @@
 #!/bin/bash
+trap 'echo "[$(date "+%F %T")] 🛑 检测到退出信号，清理 lx_core 与 node 进程..."; \
+      if [ -f /tmp/lx_core.pid ]; then \
+          CORE_PID=$(cat /tmp/lx_core.pid); \
+          echo "[$(date "+%F %T")] 🔹 终止 lx_core (PID: $CORE_PID)..."; \
+          kill -TERM -$CORE_PID 2>/dev/null; \
+          rm -f /tmp/lx_core.pid; \
+      fi; \
+      echo "[$(date "+%F %T")] 🔹 清理残留 node 进程..."; \
+      pkill -9 -f "node" 2>/dev/null; \
+      exit 0' SIGINT SIGTERM EXIT
+
+      
 CORE_SCRIPT="/root/lx_core.sh"
 LOG_FILE="/var/log/lx_core.log"
 INTERVAL=60          # 检查间隔（秒）
@@ -9,7 +21,13 @@ mkdir -p /var/log
 
 start_core() {
     echo "[$(date '+%F %T')] ▶️ 启动 $CORE_SCRIPT..."
-    nohup bash "$CORE_SCRIPT" >> "$LOG_FILE" 2>&1 &
+    if [ -t 1 ]; then
+        # 当前是交互式终端
+        bash -c "bash '$CORE_SCRIPT' 2>&1 | tee -a '$LOG_FILE'" &
+    else
+        # 后台（systemd）运行，不需要输出到终端
+        setsid bash -c "bash '$CORE_SCRIPT' >> '$LOG_FILE' 2>&1" &
+    fi
     CORE_PID=$!
     echo "$CORE_PID" > /tmp/lx_core.pid
 }
