@@ -2,7 +2,7 @@
 # ------------------- lx_config.sh -------------------
 # 交互式生成 day_commands 和 night_commands，并替换 lx.sh 中任务批次部分
 
-LX_SH_FILE="./lx.sh"
+LX_SH_FILE="./lx_core.sh"
 
 if [ ! -f "$LX_SH_FILE" ]; then
     echo "⚠️ 未找到 $LX_SH_FILE，请确认 lx.sh 在同一目录下"
