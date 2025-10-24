@@ -1,13 +1,8 @@
 #!/bin/bash
-trap 'echo "[$(date "+%F %T")] 🛑 检测到退出信号，清理 lx_core 与 node 进程..."; \
-      if [ -f /tmp/lx_core.pid ]; then \
-          CORE_PID=$(cat /tmp/lx_core.pid); \
-          echo "[$(date "+%F %T")] 🔹 终止 lx_core (PID: $CORE_PID)..."; \
-          kill -TERM -$CORE_PID 2>/dev/null; \
-          rm -f /tmp/lx_core.pid; \
-      fi; \
-      echo "[$(date "+%F %T")] 🔹 清理残留 node 进程..."; \
+trap 'echo "[$(date "+%F %T")] 🛑 检测到退出信号，直接终止 lx_core 与 node..."; \
+      pkill -9 -f "lx_core\.sh" 2>/dev/null; \
       pkill -9 -f "node" 2>/dev/null; \
+      rm -f /tmp/lx_core.pid; \
       exit 0' SIGINT SIGTERM EXIT
 
       
