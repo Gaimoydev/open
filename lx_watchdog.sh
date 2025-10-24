@@ -6,8 +6,8 @@ trap 'echo "[$(date "+%F %T")] 🛑 捕获退出信号，清理 lx_core 与 node
 
 CORE_SCRIPT="/root/lx_core.sh"
 LOG_FILE="/var/log/lx_core.log"
-INTERVAL=60          # 检查间隔（秒）
-MAX_IDLE_MIN=10      # 超过几分钟没输出就重启
+INTERVAL=60
+MAX_IDLE_MIN=10
 RESTART_DELAY=5
 
 mkdir -p /var/log
