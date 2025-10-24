@@ -1,20 +1,7 @@
 #!/bin/bash
 trap 'echo "[$(date "+%F %T")] 🛑 捕获退出信号，清理 lx_core 与 node..."; \
-      if [ -f /tmp/lx_core.pgid ]; then \
-          PGID=$(cat /tmp/lx_core.pgid); \
-          MY_PGID=$(ps -o pgid= $$ | tr -d " "); \
-          if [ "$PGID" != "$MY_PGID" ]; then \
-              echo "[$(date "+%F %T")] 🔹 杀掉进程组 PGID=$PGID..."; \
-              kill -TERM -$PGID 2>/dev/null; \
-              sleep 1; \
-              kill -9 -$PGID 2>/dev/null; \
-          else \
-              echo "[$(date "+%F %T")] ⚠️ 跳过自身进程组 ($PGID)，防止循环触发"; \
-          fi; \
-          rm -f /tmp/lx_core.pgid /tmp/lx_core.pid; \
-      fi; \
-      echo "[$(date "+%F %T")] 🔹 清理残留 node 进程..."; \
-      pkill -9 -f "node" 2>/dev/null; \
+      pkill -f -9 lx_core
+      pkill -f -9 node
       exit 0' SIGINT SIGTERM EXIT
 
 CORE_SCRIPT="/root/lx_core.sh"
@@ -35,8 +22,6 @@ start_core() {
         setsid bash -c "bash '$CORE_SCRIPT' >> '$LOG_FILE' 2>&1" &
     fi
     CORE_PID=$!
-    CORE_PGID=$(ps -o pgid= $CORE_PID | tr -d ' ')
-    echo "$CORE_PGID" > /tmp/lx_core.pgid
     echo "$CORE_PID" > /tmp/lx_core.pid
 }
 
