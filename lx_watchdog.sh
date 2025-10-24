@@ -14,6 +14,8 @@ mkdir -p /var/log
 
 start_core() {
     echo "[$(date '+%F %T')] ▶️ 启动 $CORE_SCRIPT..."
+    pkill -f -9 lx_core
+    pkill -f -9 node
     if [ -t 1 ]; then
         # 当前是交互式终端
         bash -c "bash '$CORE_SCRIPT' 2>&1 | tee -a '$LOG_FILE'" &
