@@ -21,7 +21,7 @@ CORE_SCRIPT="/root/lx_core.sh"
 LOG_FILE="/var/log/lx_core.log"
 INTERVAL=60          # 检查间隔（秒）
 MAX_IDLE_MIN=10      # 超过几分钟没输出就重启
-RESTART_DELAY=5      # 重启间隔（秒）
+RESTART_DELAY=5
 
 mkdir -p /var/log
 
