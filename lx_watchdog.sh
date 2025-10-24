@@ -2,15 +2,21 @@
 trap 'echo "[$(date "+%F %T")] 🛑 捕获退出信号，清理 lx_core 与 node..."; \
       if [ -f /tmp/lx_core.pgid ]; then \
           PGID=$(cat /tmp/lx_core.pgid); \
-          echo "[$(date "+%F %T")] 🔹 杀掉进程组 PGID=$PGID..."; \
-          kill -TERM -$PGID 2>/dev/null; \
-          sleep 1; \
-          kill -9 -$PGID 2>/dev/null; \
+          MY_PGID=$(ps -o pgid= $$ | tr -d " "); \
+          if [ "$PGID" != "$MY_PGID" ]; then \
+              echo "[$(date "+%F %T")] 🔹 杀掉进程组 PGID=$PGID..."; \
+              kill -TERM -$PGID 2>/dev/null; \
+              sleep 1; \
+              kill -9 -$PGID 2>/dev/null; \
+          else \
+              echo "[$(date "+%F %T")] ⚠️ 跳过自身进程组 ($PGID)，防止循环触发"; \
+          fi; \
           rm -f /tmp/lx_core.pgid /tmp/lx_core.pid; \
       fi; \
       echo "[$(date "+%F %T")] 🔹 清理残留 node 进程..."; \
       pkill -9 -f "node" 2>/dev/null; \
       exit 0' SIGINT SIGTERM EXIT
+
 
 
       
