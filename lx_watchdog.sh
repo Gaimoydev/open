@@ -27,10 +27,8 @@ start_core() {
 
 restart_core() {
     echo "[$(date '+%F %T')] ⚠️ 检测到 $CORE_SCRIPT 卡死或无输出，正在重启..."
-    if [ -f /tmp/lx_core.pid ]; then
-        kill -9 $(cat /tmp/lx_core.pid) 2>/dev/null
-        rm -f /tmp/lx_core.pid
-    fi
+    pkill -f -9 lx_core
+    pkill -f -9 node
     sleep "$RESTART_DELAY"
     start_core
 }
