@@ -1,6 +1,6 @@
 #!/bin/bash
 trap 'echo "[$(date "+%F %T")] 🛑 检测到退出信号，直接终止 lx_core 与 node..."; \
-      pkill -9 -f "lx_core\.sh" 2>/dev/null; \
+      pkill -9 -f "lx_core" 2>/dev/null; \
       pkill -9 -f "node" 2>/dev/null; \
       rm -f /tmp/lx_core.pid; \
       exit 0' SIGINT SIGTERM EXIT
