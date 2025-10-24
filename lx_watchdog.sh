@@ -17,9 +17,6 @@ trap 'echo "[$(date "+%F %T")] 🛑 捕获退出信号，清理 lx_core 与 node
       pkill -9 -f "node" 2>/dev/null; \
       exit 0' SIGINT SIGTERM EXIT
 
-
-
-      
 CORE_SCRIPT="/root/lx_core.sh"
 LOG_FILE="/var/log/lx_core.log"
 INTERVAL=60          # 检查间隔（秒）
