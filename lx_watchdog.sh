@@ -17,10 +17,8 @@ start_core() {
     pkill -f -9 lx_core
     pkill -f -9 node
     if [ -t 1 ]; then
-        # 当前是交互式终端
         bash -c "bash '$CORE_SCRIPT' 2>&1 | tee -a '$LOG_FILE'" &
     else
-        # 后台（systemd）运行，不需要输出到终端
         setsid bash -c "bash '$CORE_SCRIPT' >> '$LOG_FILE' 2>&1" &
     fi
     CORE_PID=$!
@@ -35,10 +33,8 @@ restart_core() {
     start_core
 }
 
-# 启动时先运行一次核心脚本
 start_core
 
-# 主循环：监控日志更新时间
 while true; do
     if [ ! -f "$LOG_FILE" ]; then
         echo "[$(date '+%F %T')] ❗ 日志文件不存在，重新启动核心脚本..."
