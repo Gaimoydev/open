@@ -1,9 +1,17 @@
 #!/bin/bash
-trap 'echo "[$(date "+%F %T")] 🛑 检测到退出信号，直接终止 lx_core 与 node..."; \
-      pkill -9 -f "lx_core" 2>/dev/null; \
+trap 'echo "[$(date "+%F %T")] 🛑 捕获退出信号，清理 lx_core 与 node..."; \
+      if [ -f /tmp/lx_core.pgid ]; then \
+          PGID=$(cat /tmp/lx_core.pgid); \
+          echo "[$(date "+%F %T")] 🔹 杀掉进程组 PGID=$PGID..."; \
+          kill -TERM -$PGID 2>/dev/null; \
+          sleep 1; \
+          kill -9 -$PGID 2>/dev/null; \
+          rm -f /tmp/lx_core.pgid /tmp/lx_core.pid; \
+      fi; \
+      echo "[$(date "+%F %T")] 🔹 清理残留 node 进程..."; \
       pkill -9 -f "node" 2>/dev/null; \
-      rm -f /tmp/lx_core.pid; \
       exit 0' SIGINT SIGTERM EXIT
+
 
       
 CORE_SCRIPT="/root/lx_core.sh"
@@ -24,6 +32,8 @@ start_core() {
         setsid bash -c "bash '$CORE_SCRIPT' >> '$LOG_FILE' 2>&1" &
     fi
     CORE_PID=$!
+    CORE_PGID=$(ps -o pgid= $CORE_PID | tr -d ' ')
+    echo "$CORE_PGID" > /tmp/lx_core.pgid
     echo "$CORE_PID" > /tmp/lx_core.pid
 }
 
