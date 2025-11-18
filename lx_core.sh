@@ -1,7 +1,4 @@
 #!/bin/bash
-LOCK_FILE="/tmp/lx.lock"
-exec 200>"$LOCK_FILE"
-flock -n 200 || { echo "轮训已经在运行"; exit 1; }
 # ------------------- 配置 -------------------
 log_dir="tmp"
 mkdir -p "$log_dir"
