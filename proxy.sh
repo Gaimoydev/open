@@ -6,8 +6,6 @@ set -euo pipefail
 URLS_GLOBAL=(
   "https://proxyapi.sswc.cfd/api.php?key=ay4t9b1w0s"
   "https://proxy.scdn.io/text.php"
-  "https://raw.githubusercontent.com/vmheaven/VMHeaven-Free-Proxy-Updated/refs/heads/main/http_anonymous.txt"
-  "https://cdn.jsdelivr.net/gh/proxifly/free-proxy-list@main/proxies/protocols/http/data.txt"
 )
 
 # 中国
@@ -15,7 +13,7 @@ URLS_CN=(
   "https://proxyapi.sswc.cfd/api.php?key=ay4t9b1w0s&geo=cn"
 )
 
-PROXY_TEST_THREADS=10000
+PROXY_TEST_THREADS=5000
 
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') - $*"; }
 
