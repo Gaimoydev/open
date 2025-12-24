@@ -50,7 +50,7 @@ test_proxy() {
       --proxy "http://$proxy" \
       --connect-timeout 5 \
       --max-time 10 \
-      http://example.com \
+      http://www.bing.com \
       >/dev/null 2>&1; then
     echo "$proxy"
   fi
