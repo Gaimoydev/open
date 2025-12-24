@@ -754,16 +754,6 @@ setInterval(() => {
     }
 }, 10000);
 
-const net = require('net');
-const tls = require('tls');
-const HPACK = require('hpack');
-const cluster = require('cluster');
-const fs = require('fs');
-const os = require('os');
-const colors = require('colors');
-const crypto = require('crypto');
-const { exec } = require('child_process');
-
 if (!global.gc) {
     require('v8-compile-cache');
 } else {
