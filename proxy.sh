@@ -155,7 +155,7 @@ merge_sources() {
 }
 
 update_proxy_list() {
-  stop_proxy_consumers
+  # stop_proxy_consumers
 
   log "开始更新全球代理..."
   merge_sources URLS_GLOBAL "proxy_raw.txt" 1
@@ -170,7 +170,7 @@ update_proxy_list() {
   rm -f cn_raw.txt
   log "国内代理完成 -> cn.txt"
 
-  start_watchdog
+  # start_watchdog
 }
 
 # ===== 主循环 =====
