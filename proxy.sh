@@ -6,17 +6,13 @@ set -euo pipefail
 URLS_GLOBAL=(
   "https://proxyapi.sswc.cfd/api.php?key=ay4t9b1w0s"
   "https://proxy.scdn.io/text.php"
-  "https://api.proxyscrape.com/v2/?request=getproxies&protocol=http&timeout=10000"
-  "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/refs/heads/master/http.txt"
-  "https://raw.githubusercontent.com/ErcinDedeoglu/proxies/refs/heads/main/proxies/http.txt"
-  "https://raw.githubusercontent.com/komutan234/Proxy-List-Free/refs/heads/main/proxies/http.txt"
-  "https://proxy.wuhen.shop/api/proxy?key=dbcffe90314c0896&limit=-1"
+  "https://raw.githubusercontent.com/vmheaven/VMHeaven-Free-Proxy-Updated/refs/heads/main/http_anonymous.txt"
+  "https://cdn.jsdelivr.net/gh/proxifly/free-proxy-list@main/proxies/protocols/http/data.txt"
 )
 
 # 中国
 URLS_CN=(
   "https://proxyapi.sswc.cfd/api.php?key=ay4t9b1w0s&geo=cn"
-  "https://proxy.wuhen.shop/api/proxy?key=dbcffe90314c0896&country=CN&limit=-1"
 )
 
 PROXY_TEST_THREADS=10000
@@ -24,8 +20,11 @@ PROXY_TEST_THREADS=10000
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') - $*"; }
 
 normalize_list() {
-  tr ' \t,' '\n' \
-  | sed 's/^[[:space:]]\+//; s/[[:space:]]\+$//' \
+  sed -E '
+    s#^[[:space:]]*(https?|socks5?|socks4)://##I
+    s/[[:space:]]+$//
+  ' \
+  | tr ' \t,' '\n' \
   | grep -v '^[[:space:]]*$' \
   | grep -E '^[^[:space:]]+:[0-9]{2,5}$' || true
 }
@@ -50,7 +49,7 @@ test_proxy() {
       --proxy "http://$proxy" \
       --connect-timeout 5 \
       --max-time 10 \
-      http://www.bing.com \
+      http://example.com/ \
       >/dev/null 2>&1; then
     echo "$proxy"
   fi
