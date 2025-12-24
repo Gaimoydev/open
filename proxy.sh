@@ -42,13 +42,12 @@ start_watchdog() {
 
 test_proxy() {
   local proxy="$1"
+  local host port
 
-  if curl -s \
-      --proxy "http://$proxy" \
-      --connect-timeout 5 \
-      --max-time 10 \
-      http://example.com/ \
-      >/dev/null 2>&1; then
+  host="${proxy%:*}"
+  port="${proxy##*:}"
+
+  if timeout 5 bash -c ">/dev/tcp/$host/$port" 2>/dev/null; then
     echo "$proxy"
   fi
 }
@@ -158,14 +157,14 @@ update_proxy_list() {
 
   log "开始更新全球代理..."
   merge_sources URLS_GLOBAL "proxy_raw.txt" 1
-  filter_bad_ip_ranges < proxy_raw.txt > proxy.txt
+  filter_alive_proxies "proxy_raw.txt" "proxy.txt"
   cp -f proxy.txt proxy1.txt
   rm -f proxy_raw.txt
   log "全球代理完成 -> proxy.txt / proxy1.txt"
 
   log "开始更新国内代理..."
   merge_sources URLS_CN "cn_raw.txt" 0
-  filter_bad_ip_ranges < cn_raw.txt > cn.txt
+  filter_alive_proxies "cn_raw.txt" "cn.txt"
   rm -f cn_raw.txt
   log "国内代理完成 -> cn.txt"
 
