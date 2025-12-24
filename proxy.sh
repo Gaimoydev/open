@@ -1,6 +1,4 @@
 #!/bin/bash
-# proxy_updater.sh (merged + dedup + normalize + atomic write)
-
 set -euo pipefail
 
 # ===== 源配置 =====
@@ -8,6 +6,10 @@ set -euo pipefail
 URLS_GLOBAL=(
   "https://proxyapi.sswc.cfd/api.php?key=ay4t9b1w0s"
   "https://proxy.scdn.io/text.php"
+  "https://api.proxyscrape.com/v2/?request=getproxies&protocol=http&timeout=10000"
+  "https://raw.githubusercontent.com/TheSpeedX/PROXY-List/refs/heads/master/http.txt"
+  "https://raw.githubusercontent.com/ErcinDedeoglu/proxies/refs/heads/main/proxies/http.txt"
+  "https://raw.githubusercontent.com/komutan234/Proxy-List-Free/refs/heads/main/proxies/http.txt"
   "https://proxy.wuhen.shop/api/proxy?key=dbcffe90314c0896&limit=-1"
 )
 
@@ -17,10 +19,10 @@ URLS_CN=(
   "https://proxy.wuhen.shop/api/proxy?key=dbcffe90314c0896&country=CN&limit=-1"
 )
 
-# ===== 通用函数 =====
+PROXY_TEST_THREADS=10000
+
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') - $*"; }
 
-# 归一化：把空格/制表/逗号分割的列表拆成一行一条，过滤空行和明显非法项
 normalize_list() {
   tr ' \t,' '\n' \
   | sed 's/^[[:space:]]\+//; s/[[:space:]]\+$//' \
@@ -28,7 +30,50 @@ normalize_list() {
   | grep -E '^[^[:space:]]+:[0-9]{2,5}$' || true
 }
 
-# 下载一个 URL 并追加到临时汇总文件
+stop_proxy_consumers() {
+  log "停止相关进程..."
+
+  pkill -9 -x node || true
+  pkill -9 -x tcp || true
+  systemctl stop lx_watchdog || true
+}
+
+start_watchdog() {
+  log "启动 lx_watchdog..."
+  systemctl start lx_watchdog || true
+}
+
+test_proxy() {
+  local proxy="$1"
+
+  if curl -s -I \
+      --proxy "http://$proxy" \
+      --connect-timeout 5 \
+      --max-time 10 \
+      http://example.com \
+      >/dev/null 2>&1; then
+    echo "$proxy"
+  fi
+}
+export -f test_proxy
+
+
+filter_alive_proxies() {
+  local in_file="$1"
+  local out_file="$2"
+
+  log "开始测试代理存活（并发 $PROXY_TEST_THREADS）..."
+
+  filter_bad_ip_ranges < "$in_file" \
+    | xargs -n 1 -P "$PROXY_TEST_THREADS" -I {} \
+        bash -c 'test_proxy "$@"' _ {} \
+    | sort -u \
+    | shuf > "$out_file"
+
+  log "存活代理数量：$(wc -l < "$out_file")"
+}
+
+
 fetch_and_append() {
   local url="$1"
   local out_tmp="$2"
@@ -36,7 +81,6 @@ fetch_and_append() {
   tmp="$(mktemp)"
 
   if curl -sS --connect-timeout 5 --max-time 10 --retry 2 --retry-delay 1 "$url" -o "$tmp"; then
-    # 归一化后追加
     normalize_list <"$tmp" >>"$out_tmp" || true
     log "获取成功：$url"
   else
@@ -45,26 +89,57 @@ fetch_and_append() {
   rm -f "$tmp"
 }
 
-# 合并多个源 -> 去重 ->（可选打乱）-> 原子写入
+is_bad_ip() {
+  local ip="$1"
+
+  case "$ip" in
+    0.*|10.*|127.*|169.254.*|172.1[6-9].*|172.2[0-9].*|172.3[0-1].*|192.168.*)
+      return 0 ;;
+    100.6[4-9].*|100.[7-9][0-9].*|100.1[0-1][0-9].*|100.12[0-7].*)
+      return 0 ;;
+    198.18.*|198.19.*)
+      return 0 ;;
+    224.*|23[0-9].*|24[0-9].*|25[0-5].*)
+      return 0 ;;
+  esac
+
+  return 1
+}
+
+filter_bad_ip_ranges() {
+  while read -r line; do
+    ip="${line%:*}"
+    if ! is_bad_ip "$ip"; then
+      echo "$line"
+    fi
+  done
+}
+
 merge_sources() {
-  local -n urls_ref=$1   # bash 4+ nameref
+  local -n urls_ref=$1
   local out_file="$2"
-  local do_shuffle="${3:-0}"  # 1=打乱
+  local do_shuffle="${3:-0}"
   local tmp_all tmp_sorted tmp_final
 
   tmp_all="$(mktemp)"
   tmp_sorted="$(mktemp)"
   tmp_final="$(mktemp)"
 
-  # 抓取所有源
   for u in "${urls_ref[@]}"; do
     fetch_and_append "$u" "$tmp_all"
   done
 
-  # 去重
+  local count_before count_after
+
+  count_before=$(wc -l < "$tmp_all" || echo 0)
+
   sort -u "$tmp_all" > "$tmp_sorted"
 
-  # 如果全为空，给出提示但仍然写空文件（保持文件存在）
+  count_after=$(wc -l < "$tmp_sorted" || echo 0)
+
+  log "$out_file 去重前数量: $count_before, 去重后数量: $count_after"
+
+
   if [[ ! -s "$tmp_sorted" ]]; then
     log "警告：$out_file 没有从任何源获取到数据（将写入空文件）"
     : > "$tmp_final"
@@ -76,21 +151,28 @@ merge_sources() {
     fi
   fi
 
-  # 原子覆盖
   mv -f "$tmp_final" "$out_file"
 
   rm -f "$tmp_all" "$tmp_sorted"
 }
 
 update_proxy_list() {
+  stop_proxy_consumers
+
   log "开始更新全球代理..."
-  merge_sources URLS_GLOBAL "proxy.txt" 1
+  merge_sources URLS_GLOBAL "proxy_raw.txt" 1
+  filter_alive_proxies "proxy_raw.txt" "proxy.txt"
   cp -f proxy.txt proxy1.txt
+  rm -f proxy_raw.txt
   log "全球代理完成 -> proxy.txt / proxy1.txt"
 
   log "开始更新国内代理..."
-  merge_sources URLS_CN "cn.txt" 0
+  merge_sources URLS_CN "cn_raw.txt" 0
+  filter_alive_proxies "cn_raw.txt" "cn.txt"
+  rm -f cn_raw.txt
   log "国内代理完成 -> cn.txt"
+
+  start_watchdog
 }
 
 # ===== 主循环 =====
