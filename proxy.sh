@@ -6,18 +6,14 @@ set -euo pipefail
 # ===== 源配置 =====
 # 全球
 URLS_GLOBAL=(
-  "https://proxiespool.wiki/proxy.txt?key=agedcgbe"
   "https://proxyapi.sswc.cfd/api.php?key=ay4t9b1w0s"
-  "https://vip.qiucg.com/proxy.txt?key=hffgcbcf"
-  "https://main.proxypool.us/api/proxy?key=jqoqVzRusu80pDENJgKYTUcOMooVx9lsz7SCsA82qGIjxnkV&type=http"
+  "https://proxy.scdn.io/text.php"
 )
 
 # 中国
 URLS_CN=(
-  "https://proxiespool.wiki/cn.txt?key=agedcgbe"
-  "https://vip.qiucg.com/cn.txt?key=hffgcbcf"
   "https://proxyapi.sswc.cfd/api.php?key=ay4t9b1w0s&geo=cn"
-  "https://main.proxypool.us/api/proxy?key=jqoqVzRusu80pDENJgKYTUcOMooVx9lsz7SCsA82qGIjxnkV&type=cn"
+  "https://proxy.scdn.io/text.php"
 )
 
 # ===== 通用函数 =====
