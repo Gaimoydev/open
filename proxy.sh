@@ -48,7 +48,7 @@ test_proxy() {
 
   if curl -s \
       --proxy "http://$proxy" \
-      --connect-timeout 8 \
+      --connect-timeout 5 \
       --max-time 10 \
       http://www.bing.com \
       >/dev/null 2>&1; then
