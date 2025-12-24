@@ -7,13 +7,13 @@ set -euo pipefail
 # 全球
 URLS_GLOBAL=(
   "https://proxyapi.sswc.cfd/api.php?key=ay4t9b1w0s"
-  "https://proxy.scdn.io/text.php"
+  "https://proxy.wuhen.shop/api/proxy?key=dbcffe90314c0896&limit=-1"
 )
 
 # 中国
 URLS_CN=(
   "https://proxyapi.sswc.cfd/api.php?key=ay4t9b1w0s&geo=cn"
-  "https://proxy.scdn.io/text.php"
+  "https://proxy.wuhen.shop/api/proxy?key=dbcffe90314c0896&country=CN&limit=-1"
 )
 
 # ===== 通用函数 =====
