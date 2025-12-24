@@ -6,6 +6,7 @@ set -euo pipefail
 URLS_GLOBAL=(
   "https://proxyapi.sswc.cfd/api.php?key=ay4t9b1w0s"
   "https://proxy.scdn.io/text.php"
+  "https://cdn.jsdelivr.net/gh/proxifly/free-proxy-list@main/proxies/protocols/http/data.txt"
   "https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/refs/heads/main/http/raw/all.txt"
 )
 
@@ -26,19 +27,6 @@ normalize_list() {
   | tr ' \t,' '\n' \
   | grep -v '^[[:space:]]*$' \
   | grep -E '^[^[:space:]]+:[0-9]{2,5}$' || true
-}
-
-stop_proxy_consumers() {
-  log "停止相关进程..."
-
-  pkill -9 -x node || true
-  pkill -9 -x tcp || true
-  systemctl stop lx_watchdog || true
-}
-
-start_watchdog() {
-  log "启动 lx_watchdog..."
-  systemctl start lx_watchdog || true
 }
 
 test_proxy() {
@@ -154,7 +142,6 @@ merge_sources() {
 }
 
 update_proxy_list() {
-  # stop_proxy_consumers
 
   log "开始更新全球代理..."
   merge_sources URLS_GLOBAL "proxy_raw.txt" 1
@@ -169,7 +156,6 @@ update_proxy_list() {
   rm -f cn_raw.txt
   log "国内代理完成 -> cn.txt"
 
-  # start_watchdog
 }
 
 # ===== 主循环 =====
