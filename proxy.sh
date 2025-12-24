@@ -46,9 +46,9 @@ start_watchdog() {
 test_proxy() {
   local proxy="$1"
 
-  if curl -s -I \
+  if curl -s \
       --proxy "http://$proxy" \
-      --connect-timeout 5 \
+      --connect-timeout 8 \
       --max-time 10 \
       http://www.bing.com \
       >/dev/null 2>&1; then
