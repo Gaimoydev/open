@@ -5,14 +5,14 @@ set -euo pipefail
 # 全球
 URLS_GLOBAL=(
   "https://proxyapi.sswc.cfd/api.php?key=0b2c885d4a23d97f"
-  "https://proxy.wuhen.shop/api/proxy?key=84bc9a8d1b1a00d1&limit=-1"
+  "https://proxy.wuhen.shop/api/proxy?key=0b2c885d4a23d97f&limit=-1"
   "https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/refs/heads/main/http/raw/all.txt"
 )
 
 # 中国
 URLS_CN=(
   "https://proxyapi.sswc.cfd/api.php?key=ay4t9b1w0s&geo=cn"
-  "https://proxy.wuhen.shop/api/proxy?key=84bc9a8d1b1a00d1&limit=-1&country=CN"
+  "https://proxy.wuhen.shop/api/proxy?key=0b2c885d4a23d97f&limit=-1&country=CN"
 )
 
 PROXY_TEST_THREADS=5000
