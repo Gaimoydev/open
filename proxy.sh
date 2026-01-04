@@ -4,7 +4,7 @@ set -euo pipefail
 # ===== 源配置 =====
 # 全球
 URLS_GLOBAL=(
-  "https://proxyapi.sswc.cfd/api.php?key=0b2c885d4a23d97f"
+  "https://proxyapi.sswc.cfd/api.php?key=ay4t9b1w0s"
   "https://proxy.wuhen.shop/api/proxy?key=0b2c885d4a23d97f&limit=-1"
   "https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/refs/heads/main/http/raw/all.txt"
 )
