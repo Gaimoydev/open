@@ -5,7 +5,6 @@ set -euo pipefail
 # 全球
 URLS_GLOBAL=(
   "https://proxyapi.sswc.cfd/api.php?key=ay4t9b1w0s"
-  "https://api.89ip.cn/tqdl.html?api=1&num=9999&port=&address=&isp="
   "https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/refs/heads/main/http/raw/all.txt"
 )
 
