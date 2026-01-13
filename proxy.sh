@@ -5,18 +5,15 @@ set -euo pipefail
 # 全球
 URLS_GLOBAL=(
   "https://proxyapi.sswc.cfd/api.php?key=ay4t9b1w0s"
-  "https://proxy.scdn.io/text.php"
-  "https://proxy.wuhen.shop/api/proxy?key=0b2c885d4a23d97f&limit=-1"
   "https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/refs/heads/main/http/raw/all.txt"
 )
 
 # 中国
 URLS_CN=(
   "https://proxyapi.sswc.cfd/api.php?key=ay4t9b1w0s&geo=cn"
-  "https://proxy.wuhen.shop/api/proxy?key=0b2c885d4a23d97f&limit=-1&country=CN"
 )
 
-PROXY_TEST_THREADS=5000
+PROXY_TEST_THREADS=1000
 
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') - $*"; }
 
@@ -66,7 +63,7 @@ fetch_and_append() {
   local tmp
   tmp="$(mktemp)"
 
-  if curl -sS --connect-timeout 5 --max-time 10 --retry 2 --retry-delay 1 "$url" -o "$tmp"; then
+  if curl -sS --connect-timeout 5 --max-time 30 --retry 2 --retry-delay 1 "$url" -o "$tmp"; then
     normalize_list <"$tmp" >>"$out_tmp" || true
     log "获取成功：$url"
   else
