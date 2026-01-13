@@ -5,6 +5,7 @@ set -euo pipefail
 # 全球
 URLS_GLOBAL=(
   "https://proxyapi.sswc.cfd/api.php?key=ay4t9b1w0s"
+  "https://api.89ip.cn/tqdl.html?api=1&num=9999&port=&address=&isp="
   "https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/refs/heads/main/http/raw/all.txt"
 )
 
@@ -27,12 +28,22 @@ normalize_list() {
   | grep -E '^[^[:space:]]+:[0-9]{2,5}$' || true
 }
 
+extract_ip_port() {
+  grep -oE '([0-9]{1,3}\.){3}[0-9]{1,3}:[0-9]{2,5}' || true
+}
+
+
 test_proxy() {
   local proxy="$1"
   local host port
 
   host="${proxy%:*}"
   port="${proxy##*:}"
+
+  if ping -c 1 -W 1 "$host" >/dev/null 2>&1; then
+    echo "$proxy"
+    return
+  fi
 
   if timeout 5 bash -c ">/dev/tcp/$host/$port" 2>/dev/null; then
     echo "$proxy"
@@ -64,11 +75,14 @@ fetch_and_append() {
   tmp="$(mktemp)"
 
   if curl -sS --connect-timeout 5 --max-time 30 --retry 2 --retry-delay 1 "$url" -o "$tmp"; then
-    normalize_list <"$tmp" >>"$out_tmp" || true
+    extract_ip_port <"$tmp" \
+      | normalize_list \
+      >>"$out_tmp" || true
     log "获取成功：$url"
   else
     log "获取失败：$url"
   fi
+
   rm -f "$tmp"
 }
 
