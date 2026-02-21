@@ -10,7 +10,7 @@ wait_between_targets=3
 wait_between_loops=3
 running=true
 
-WS_SERVER="ws://38.14.254.58:11451"
+WS_SERVER="ws://70.39.201.186:11451"
 
 # ------------------- 信号捕获 -------------------
 trap 'echo "🛑 捕获中断，终止中..."; running=false; pkill -TERM -g $$; exit 0' SIGINT
