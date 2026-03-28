@@ -5,6 +5,7 @@ set -euo pipefail
 # 全球
 URLS_GLOBAL=(
   "https://proxyapi.sswc.cfd/api.php?key=ay4t9b1w0s"
+  "http://204.76.203.51:8000/raw_data?key=xiaotianJS8888"
   "https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/refs/heads/main/http/raw/all.txt"
 )
 
