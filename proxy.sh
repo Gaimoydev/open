@@ -12,6 +12,7 @@ URLS_GLOBAL=(
 # 中国
 URLS_CN=(
   "https://proxyapi.sswc.cfd/api.php?key=ay4t9b1w0s&geo=cn"
+  "http://204.76.203.51:8000/raw_data?key=xiaotianCN88oo88aotian"
   "https://proxy.wuhen.shop/api/proxy?key=a08f77f361776bd8&limit=-1&country=CN"
 )
 
