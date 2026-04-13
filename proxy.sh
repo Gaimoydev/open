@@ -6,15 +6,13 @@ set -euo pipefail
 URLS_GLOBAL=(
   "https://proxyapi.sswc.cfd/api.php?key=ay4t9b1w0s"
   "http://204.76.203.51:8000/raw_data?key=xiaotianCN88oo88aotian"
-  "https://proxy.wuhen.shop/api/proxy?key=a08f77f361776bd8&limit=-1"
+  "https://www.proxypool.us/api/proxy?key=codbBPEtJLlNjsHI&quantity=all&type=text"
   "https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/refs/heads/main/http/raw/all.txt"
 )
 
 # 中国
 URLS_CN=(
   "https://proxyapi.sswc.cfd/api.php?key=ay4t9b1w0s&geo=cn"
-  "http://204.76.203.51:8000/raw_data?key=xiaotianCN88oo88aotian"
-  "https://proxy.wuhen.shop/api/proxy?key=a08f77f361776bd8&limit=-1&country=CN"
 )
 
 PROXY_TEST_THREADS=1000
